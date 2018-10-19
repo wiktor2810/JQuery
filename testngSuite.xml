@@ -1,0 +1,11 @@
+<suite name="Paremeters Suite">
+    <test name="Test 1">
+        <parameter name="number1" value="80"></parameter>
+        <parameter name="number2" value="50"></parameter>
+        <parameter name="number3" value="55"></parameter>
+        <parameter name="number4" value="55"></parameter>
+        <classes>
+            <class name="Slider"></class>
+        </classes>
+</test>
+</suite>
