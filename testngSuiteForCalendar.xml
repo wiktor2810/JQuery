@@ -1,0 +1,13 @@
+<!DOCTYPE suite SYSTEM "http://testng.org/testng-1.0.dtd" >
+<suite name="Paremeters Suite Calendar">
+    <test name="Test 2">
+        <parameter name="Date1" value="1.02.2019"></parameter>
+        <parameter name="Date2" value="27.12.2018"></parameter>
+        <parameter name="Date3" value="22.10.2018"></parameter>
+        <parameter name="Date4" value="06.07.2018"></parameter>
+        <parameter name="Date5" value="20.11.2017"></parameter>
+        <classes>
+            <class name="Calendar"></class>
+        </classes>
+    </test>
+</suite>
