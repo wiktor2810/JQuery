@@ -1,38 +1,43 @@
-import org.openqa.selenium.By;
+package pages;
+
 import org.openqa.selenium.Keys;
+import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.interactions.Actions;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
 
-public class Slider extends Base{
+import java.util.ArrayList;
+import java.util.List;
 
-    Actions actions;
-    WebElement slider;
+public class SliderPage extends BasePage{
 
-    @Test
-    @Parameters({"number1", "number2", "number3", "number4"})
-    public void slider(String number1, String number2, String number3, String number4) {
-        driver.get("https://jqueryui.com/slider/#custom-handle");
-        driver.switchTo().frame(0);
+    List<WebElement> elements;
 
-        slider = driver.findElement(By.cssSelector("div[id='custom-handle']"));
-        actions = new Actions(driver);
-
-        slider.click();
-
-        int number1AfterParse = Integer.parseInt(number1);
-        int number2AfterParse = Integer.parseInt(number2);
-        int number3AfterParse = Integer.parseInt(number3);
-        int number4AfterParse = Integer.parseInt(number4);
-
-        slidingForManyParameters(number1AfterParse, number2AfterParse, number3AfterParse, number4AfterParse);
+    public SliderPage(WebDriver driver){
+        super(driver);
+        switchToFrame();
+        PageFactory.initElements(driver, this);
+        waitToSetupElements();
     }
 
 
+    @FindBy(css = "div[id='custom-handle']")
+    private WebElement slider;
+
+    public void switchToFrame(){
+        driver.switchTo().frame(0);
+    }
+
+    public SliderPage clickSlider(){
+        slider.click();
+        return this;
+    }
+
     public void slidingForManyParameters(int a, int b, int c, int d){
 
+        Actions actions = new Actions(driver);
         int[] parameters = {a, b, c, d};
 
         for(int i =0; i < parameters.length; i++) {
@@ -55,6 +60,12 @@ public class Slider extends Base{
             Assert.assertEquals(readValue, value);
 
         }
+    }
+
+    public void waitToSetupElements(){
+        elements = new ArrayList<WebElement>();
+        elements.add(slider);
+        waitForElements(elements);
     }
 
 }

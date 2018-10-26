@@ -1,46 +1,52 @@
+package pages;
+
 import org.joda.time.DateTime;
 import org.joda.time.Months;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.support.FindBy;
+import org.openqa.selenium.support.PageFactory;
 import org.testng.Assert;
-import org.testng.annotations.Parameters;
-import org.testng.annotations.Test;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
-public class Calendar {
+public class CalendarPage extends BasePage{
 
-    WebDriver driver;
+    Date currentDate;
 
-    @Test
-    @Parameters({"Date1", "Date2", "Date3", "Date4", "Date5"})
-    public void calendar(String Date1, String Date2, String Date3, String Date4, String Date5) throws java.text.ParseException {
+    public CalendarPage(WebDriver driver){
+        super(driver);
+        PageFactory.initElements(driver, this);
+    }
 
-        String[] parameters = {Date1, Date2, Date3, Date4, Date5};
+    @FindBy(css = ".hasDatepicker")
+    private WebElement calendar;
+
+    @FindBy(css = ".ui-datepicker-month")
+    private WebElement currentMonthWebElement;
+
+    @FindBy(css = ".ui-datepicker-year")
+    private WebElement currenYearWebElement;
+
+    @FindBy(css = "a[class*='ui-state-highlight']")
+    private WebElement currrentDayWebElement;
 
 
-        for (int j = 0; j < parameters.length; j++) {
+    public CalendarPage getCalendar(){
+        driver.get("https://jqueryui.com/datepicker/#other-months");
+        return this;
+    }
 
-        System.setProperty("webdriver.chrome.driver", "src\\resources\\chromedriver.exe");
-        ChromeOptions options = new ChromeOptions();
-        options.addArguments("start-maximized");
-        options.addArguments("disable-extensions");
-        driver = new ChromeDriver(options);
 
-        driver.get("https://jqueryui.com/datepicker/");
+    public CalendarPage switchToFrame(){
         driver.switchTo().frame(0);
+        return this;
+    }
 
-        WebElement calendar = driver.findElement(By.cssSelector(".hasDatepicker"));
+    public CalendarPage getCurrentDate () throws java.text.ParseException{
         calendar.click();
-        WebElement currentMonthWebElement = driver.findElement(By.cssSelector(".ui-datepicker-month"));
-        WebElement currenYearWebElement = driver.findElement(By.cssSelector(".ui-datepicker-year"));
-        WebElement currrentDayWebElement = driver.findElement(By.cssSelector("a[class*='ui-state-highlight']"));
 
         Map months = new HashMap();
         months.put("January", "1");
@@ -61,8 +67,18 @@ public class Calendar {
         String month = (String) months.get(monthBeforeMap);
         String day = currrentDayWebElement.getText();
         String currentDateString = day + "." + month + "." + year;
-        Date currentDate = new SimpleDateFormat("dd.MM.yyyy").parse(currentDateString);
+        currentDate = new SimpleDateFormat("dd.MM.yyyy").parse(currentDateString);
         System.out.println(currentDate);
+        return this;
+    }
+
+    public void validateDate(String[] parameters) throws java.text.ParseException{
+        for (int j = 0; j < parameters.length; j++) {
+
+            calendar.clear();
+            WebElement resetClick = driver.findElement(By.cssSelector("body > p"));
+            resetClick.click();
+            calendar.click();
 
             String sourceDateString = parameters[j];
 
@@ -86,15 +102,22 @@ public class Calendar {
                     WebElement prevWebElement = driver.findElement(By.xpath("//span[contains(text(),'Prev')]"));
                     prevWebElement.click();
                 }
-
             }
 
             int dayOfSourceDateBeforeParse = Integer.parseInt(new SimpleDateFormat("dd").format(sourceDate));
+            int monthOfSourceDateBeforeParse = Integer.parseInt(new SimpleDateFormat("MM").format(sourceDate));
             String dayForWebElement = String.valueOf(dayOfSourceDateBeforeParse);
 
-            WebElement dayOfSourceDate = driver.findElement(By.linkText(dayForWebElement));
-            dayOfSourceDate.click();
-
+            List<WebElement> daysElements = driver.findElements(By.cssSelector("tbody tr td"));
+            for (WebElement element: daysElements) {
+                if (Integer.valueOf(element.getAttribute("data-month")).equals(monthOfSourceDateBeforeParse - 1)){
+                    WebElement element1 = element.findElement(By.cssSelector("a"));
+                    String dayOfMonth = element1.getText();
+                    if (dayOfMonth.equalsIgnoreCase(dayForWebElement)){
+                        element.click();
+                    }
+                }
+            }
             String dateFromPageBeforeParse = calendar.getAttribute("value"); // mmDDyyyy  05/02/2019  || a sourcedatestring 02.05.2019
             System.out.println(dateFromPageBeforeParse);
 
@@ -103,8 +126,6 @@ public class Calendar {
             Date dateFromPage = new SimpleDateFormat("dd.MM.yyyy").parse(dateFromPageString);
 
             Assert.assertEquals(dateFromPage, sourceDate);
-
-            driver.quit();
         }
     }
 }

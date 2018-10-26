@@ -31,7 +31,7 @@
             <groupId>org.testng</groupId>
             <artifactId>testng</artifactId>
             <version>6.14.3</version>
-            <scope>test</scope>
+            <scope>src</scope>
         </dependency>
 
         <!-- https://mvnrepository.com/artifact/joda-time/joda-time -->
